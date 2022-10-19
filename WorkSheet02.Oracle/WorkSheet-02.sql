@@ -2,7 +2,7 @@
 *Sri Lanka Institute of Information Technology
 *Deparment of Computer Science and Software Engineering
 *SE3060-Database-System
-*Ashen DUnusinghe
+*Ashen Dunusinghe
 */
 
 /*
@@ -240,4 +240,97 @@ INSERT INTO OREMP VALUES
     )
 )
 
+UPDATE ORDEPT d 
+SET d.MGRNO = (SELECT REF(e) FROM OREMP e WHERE e.EMPNO = '000010')
+WHERE d.DEPTNO = 'A00'
 
+UPDATE ORDEPT d 
+SET d.MGRNO = (SELECT REF(e) FROM OREMP e WHERE e.EMPNO = '000020')
+WHERE d.DEPTNO = 'B01'
+
+UPDATE ORDEPT d 
+SET d.MGRNO = (SELECT REF(e) FROM OREMP e WHERE e.EMPNO = '000030')
+WHERE d.DEPTNO = 'B01'
+
+UPDATE ORDEPT d 
+SET d.MGRNO = (SELECT REF(e) FROM OREMP e WHERE e.EMPNO = '000060')
+WHERE d.DEPTNO = 'B01'
+
+
+/*
+*(2)
+*Answer the following queries using OREMP and ORDEPT tables
+*
+*/
+
+/*
+*(A)
+*Get the department name and manager’s lastname for all departments
+*/
+
+SELECT 
+    d.DEPTNAME, 
+    d.MGRNO.LASTNAME AS Manager
+FROM ORDEPT d
+
+
+/*
+*(B)
+*Get the employee number, lastname and the department name of every employe
+*/
+
+SELECT 
+    e.EMPNO, 
+    e.LASTNAME, 
+    e.WORKDEPT.DEPTNAME AS DepatmentName
+FROM OREMP e 
+
+/*
+*(C)
+*For each department, display the department number, department name, and name of the administrative department.
+*/
+
+SELECT 
+    d.DEPTNO, 
+    d.DEPTNAME, 
+    d.ADMRDEMPT.DEPTNAME AS AdminstrativeDepatmentName
+FROM ORDEPT d
+
+/*
+*(D)
+* For each department, display the department number, department name, the name of the administrative department and the last name of the manager of the administrative department.
+*/
+
+SELECT 
+    d.DEPTNO, 
+    d.DEPTNAME, 
+    d.ADMRDEMPT.DEPTNAME AS ADMRNAME, 
+    d.ADMRDEMPT.MGRNO.LASTNAME AS ADMANAGER
+FROM ORDEPT d
+
+/*
+*(E)
+*Display the employee number, firstname, lastname and salary of every employee, along with lastname and salary of the manager of the employee’s work department
+*/
+SELECT 
+       e.EMPNO,
+       e.FIRSTNAME,
+       e.LASTNAME,
+       e.SALARY,
+       e.WORKDEPT.MGRNO.LASTNAME AS ManagerName,
+       e.WORKDEPT.MGRNO.SALARY   AS ManagerSalary
+FROM OREMP e
+
+
+/*
+*(F)
+*Show the average salary for men and the average salary for women for each department. Identify the department by both department number and name. 
+*/
+ 
+
+SELECT 
+    e.WORKDEPT.DEPTNO   AS DeparmentNo, 
+    e.WORKDEPT.DEPTNAME AS DepatmentName, 
+    e.SEX, AVG(e.SALARY) AS AverageSalary
+FROM OREMP e
+GROUP BY e.WORKDEPT.DEPTNO, e.WORKDEPT.DEPTNAME, e.SEX
