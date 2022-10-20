@@ -63,9 +63,9 @@ CREATE TABLE clients of client_t
 )
 NESTED TABLE INVESMENT STORE AS INVESTMENTS_TABLE
 /
-ALTER TABLE INVESTMENTS_TABLE
+/*ALTER TABLE INVESTMENTS_TABLE
     ADD SCOPE FOR(COMPANY) IS STOCKS
-/
+/*/
 
 /*
 * (2)
@@ -281,5 +281,60 @@ INSERT INTO clients VALUES
 *current price, last dividend and earnings per share. 
 */
 
-SELECT c.NAME,  i.
-FROM client c TABLE (c.INVESMENT) i
+SELECT DISTINCT 
+    c.NAME,  
+    i.COMPANY.COMPANY AS CompanyName , 
+    i.COMPANY.CURRENTPRICE AS CurrentPrice,
+    i.COMPANY.LASTDIVIDEND AS LastDividend,
+    i.COMPANY.EARNINGPERSHARE AS EARNINGPERSHARE
+FROM clients c ,TABLE(c.INVESMENT) i
+
+/*
+*(B)
+*Get the list of all clients and their share investments, showing the client name, and for each 
+*stock held by the client, the name of the stock, total number of shares held, and the average 
+*purchase price paid by the client for the stock. Average price is the total purchase value paid 
+*by a client for a given stock (value=qty*price) divided by the total quantity held by the client.
+*/
+
+SELECT c.NAME, 
+       i.COMPANY.COMPANY AS CompanyName, 
+       SUM(i.QTY) AS TotalNumberOfShares,
+       SUM(i.QTY * i.PIRCHASEPRICE) AS  Total,
+       SUM(i.QTY * i.PIRCHASEPRICE) / SUM(i.QTY) AveragePrice
+FROM clients c , TABLE(c.INVESMENT) i
+GROUP BY c.NAME, i.COMPANY.COMPANY
+
+
+/*
+*(C)
+*For each stock traded in New York, find the quantity held by each client, and its current value 
+*(value=qty*price). Display stock (company) name, client name, number of shares held, and the 
+*current value of the shares.
+*/
+
+SELECT c.NAME ,SUM(i.QTY) AS TotalNumberOfShares, SUM(i.QTY *  i.COMPANY.CURRENTPRICE) AS CurrentValues
+FROM clients c ,TABLE(c.INVESMENT)i, TABLE(i.COMPANY.EXCHANGESTRADED) e
+WHERE e.COLUMN_VALUE = 'New York'
+GROUP BY c.NAME
+
+/*
+*(D)
+*Find the total purchase value of investments for all clients. Display client name and total 
+*purchase value of the client’s portfolio. 
+*/
+
+SELECT c.NAME, SUM(i.QTY * i.PIRCHASEPRICE) AS TotalPurchaseValue
+FROM clients c, TABLE(c.INVESMENT)i
+GROUP BY c.NAME 
+
+/*
+*(E)
+*For each client, list the book profit (or loss) on the total share investment. Book profit is the 
+*total value of all stocks based on the current prices less the total amount paid for purchasing 
+*them. 
+*/
+
+SELECT C.NAME, SUM(i.QTY * i.COMPANY.CURRENTPRICE) - SUM(i.QTY * i.PIRCHASEPRICE) As Profit
+FROM clients c, TABLE(c.INVESMENT)i
+GROUP BY c.NAME
