@@ -54,7 +54,7 @@ CREATE TABLE purchase
     CONSTRAINTS purchase_FK1 FOREIGN KEY(clno) REFERENCES client,
     CONSTRAINTS purchase_FK2 FOREIGN KEY(company) REFERENCES stock
 )
-
+/
 INSERT INTO client VALUES ('100', 'John Smith', '3 East Av Bentley WA 6102');
 INSERT INTO client VALUES ('101', 'Jill Brody', '442 Bent St PerthWA 6001 Bentley WA 6102');
 
